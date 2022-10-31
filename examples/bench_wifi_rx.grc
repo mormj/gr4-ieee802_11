@@ -1,0 +1,387 @@
+options:
+  parameters:
+    author: josh
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: no_gui
+    hier_block_src_path: '.:'
+    id: bench_wifi_rx
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    pyqtgraph_antialiasing: ''
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: run
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: chan_est
+  id: variable
+  parameters:
+    comment: ''
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [320, 36.0]
+    rotation: 0
+    state: true
+- name: freq
+  id: variable
+  parameters:
+    comment: ''
+    value: '2462000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [608, 36.0]
+    rotation: 0
+    state: true
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '32000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 12]
+    rotation: 0
+    state: enabled
+- name: samp_rate_0
+  id: variable
+  parameters:
+    comment: ''
+    value: '20000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [784, 36.0]
+    rotation: 0
+    state: true
+- name: sync_length
+  id: variable
+  parameters:
+    comment: ''
+    value: '320'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 148.0]
+    rotation: 0
+    state: enabled
+- name: window_size
+  id: variable
+  parameters:
+    comment: ''
+    value: '48'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 84.0]
+    rotation: 0
+    state: enabled
+- name: blocks_null_sink_0
+  id: blocks_null_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    itemsize: '0'
+    nports: '1'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [896, 580.0]
+    rotation: 0
+    state: true
+- name: fileio_file_source_0
+  id: fileio_file_source
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    filename: /data/data/cropcircles/wifi_synth_1500_1kpad_20MHz_10s_MCS0.fc32
+    impl: cpu
+    itemsize: '0'
+    len: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    offset: '0'
+    repeat: 'False'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [72, 220.0]
+    rotation: 0
+    state: true
+- name: filter_moving_average_0
+  id: filter_moving_average
+  parameters:
+    T: float
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    length: window_size  + 16
+    max_iter: '4096'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '1'
+    showports: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [728, 92.0]
+    rotation: 0
+    state: true
+- name: filter_moving_average_1
+  id: filter_moving_average
+  parameters:
+    T: complex
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    length: window_size
+    max_iter: '4096'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '1'
+    showports: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [952, 244.0]
+    rotation: 0
+    state: true
+- name: ieee802_11_sync_short_0
+  id: ieee802_11_sync_short
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    debug: 'False'
+    impl: cpu
+    log: 'False'
+    maxoutbuf: '0'
+    min_plateau: '2'
+    minoutbuf: '0'
+    showports: 'False'
+    threshold: '0.56'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [560, 548.0]
+    rotation: 0
+    state: enabled
+- name: import_0
+  id: import
+  parameters:
+    alias: ''
+    comment: ''
+    imports: import time
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1152, 4.0]
+    rotation: 0
+    state: true
+- name: math_complex_to_mag_1
+  id: math_complex_to_mag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1120, 412.0]
+    rotation: 0
+    state: true
+- name: math_complex_to_mag_squared_0
+  id: math_complex_to_mag_squared
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [400, 116.0]
+    rotation: 0
+    state: true
+- name: math_conjugate_0
+  id: math_conjugate
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [624, 244.0]
+    rotation: 0
+    state: true
+- name: math_divide_0
+  id: math_divide
+  parameters:
+    T: float
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    showports: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1352, 324.0]
+    rotation: 0
+    state: true
+- name: math_multiply_0
+  id: math_multiply
+  parameters:
+    T: complex
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    showports: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [776, 372.0]
+    rotation: 0
+    state: true
+- name: snippet_0
+  id: snippet
+  parameters:
+    alias: ''
+    code: fg.startt = time.time()
+    comment: ''
+    priority: '0'
+    section: main_after_init
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1312, 92.0]
+    rotation: 0
+    state: true
+- name: snippet_0_0
+  id: snippet
+  parameters:
+    alias: ''
+    code: 'endt = time.time()
+
+      print(f''[PROFILE_TIME]{endt-fg.startt}[PROFILE_TIME]'')'
+    comment: ''
+    priority: '0'
+    section: main_after_stop
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1328, 172.0]
+    rotation: 0
+    state: true
+- name: streamops_delay_0
+  id: streamops_delay
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dly: '16'
+    impl: cpu
+    itemsize: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [400, 236.0]
+    rotation: 0
+    state: true
+
+connections:
+- [fileio_file_source_0, '0', math_complex_to_mag_squared_0, '0']
+- [fileio_file_source_0, '0', math_multiply_0, '1']
+- [fileio_file_source_0, '0', streamops_delay_0, '0']
+- [filter_moving_average_0, '0', math_divide_0, '1']
+- [filter_moving_average_1, '0', ieee802_11_sync_short_0, '1']
+- [filter_moving_average_1, '0', math_complex_to_mag_1, '0']
+- [ieee802_11_sync_short_0, '0', blocks_null_sink_0, '0']
+- [math_complex_to_mag_1, '0', math_divide_0, '0']
+- [math_complex_to_mag_squared_0, '0', filter_moving_average_0, '0']
+- [math_conjugate_0, '0', math_multiply_0, '0']
+- [math_divide_0, '0', ieee802_11_sync_short_0, '2']
+- [math_multiply_0, '0', filter_moving_average_1, '0']
+- [streamops_delay_0, '0', ieee802_11_sync_short_0, '0']
+- [streamops_delay_0, '0', math_conjugate_0, '0']
+
+metadata:
+  file_format: 1
