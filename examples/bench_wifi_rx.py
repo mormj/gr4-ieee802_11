@@ -9,7 +9,6 @@
 # Author: josh
 # GNU Radio version: 4.0.0.0-preview0
 
-from gnuradio import blocks
 from gnuradio import fileio
 from gnuradio import filter
 from gnuradio import gr
@@ -60,6 +59,8 @@ class bench_wifi_rx(gr.flowgraph):
         ##################################################
         # Blocks
         ##################################################
+        self.streamops_stream_to_vector_0 = streamops.stream_to_vector( 64,0, impl=streamops.stream_to_vector.cpu)
+        self.streamops_delay_0_0 = streamops.delay( sync_length,0, impl=streamops.delay.cpu)
         self.streamops_delay_0 = streamops.delay( 16,0, impl=streamops.delay.cpu)
         self.math_multiply_0 = math.multiply_cc( 2,1, impl=math.multiply_cc.cpu)
         self.math_divide_0 = math.divide_ff( 2,1, impl=math.divide_ff.cpu)
@@ -67,10 +68,11 @@ class bench_wifi_rx(gr.flowgraph):
         self.math_complex_to_mag_squared_0 = math.complex_to_mag_squared( 1, impl=math.complex_to_mag_squared.cpu)
         self.math_complex_to_mag_1 = math.complex_to_mag( 1, impl=math.complex_to_mag.cpu)
         self.ieee802_11_sync_short_0 = ieee802_11.sync_short( 0.56,2,False,False, impl=ieee802_11.sync_short.cpu)
+        self.ieee802_11_sync_long_0 = ieee802_11.sync_long( 320,False,False, impl=ieee802_11.sync_long.cpu)
+        self.ieee802_11_packetize_frame_0 = ieee802_11.packetize_frame( ieee802_11.algorithm_t.LS,freq,samp_rate,False,False, impl=ieee802_11.packetize_frame.cpu)
         self.filter_moving_average_1 = filter.moving_average_cc( window_size,1,4096,1, impl=filter.moving_average_cc.cpu)
         self.filter_moving_average_0 = filter.moving_average_ff( window_size  + 16,1,4096,1, impl=filter.moving_average_ff.cpu)
         self.fileio_file_source_0 = fileio.file_source( '/data/data/cropcircles/wifi_synth_1500_1kpad_20MHz_10s_MCS0.fc32',False,0,0,0, impl=fileio.file_source.cpu)
-        self.blocks_null_sink_0 = blocks.null_sink( 1,0, impl=blocks.null_sink.cpu)
 
 
         ##################################################
@@ -82,7 +84,9 @@ class bench_wifi_rx(gr.flowgraph):
         self.connect((self.filter_moving_average_0, 0), (self.math_divide_0, 1))
         self.connect((self.filter_moving_average_1, 0), (self.ieee802_11_sync_short_0, 1))
         self.connect((self.filter_moving_average_1, 0), (self.math_complex_to_mag_1, 0))
-        self.connect((self.ieee802_11_sync_short_0, 0), (self.blocks_null_sink_0, 0))
+        self.connect((self.ieee802_11_sync_long_0, 0), (self.streamops_stream_to_vector_0, 0))
+        self.connect((self.ieee802_11_sync_short_0, 0), (self.ieee802_11_sync_long_0, 0))
+        self.connect((self.ieee802_11_sync_short_0, 0), (self.streamops_delay_0_0, 0))
         self.connect((self.math_complex_to_mag_1, 0), (self.math_divide_0, 0))
         self.connect((self.math_complex_to_mag_squared_0, 0), (self.filter_moving_average_0, 0))
         self.connect((self.math_conjugate_0, 0), (self.math_multiply_0, 0))
@@ -90,6 +94,8 @@ class bench_wifi_rx(gr.flowgraph):
         self.connect((self.math_multiply_0, 0), (self.filter_moving_average_1, 0))
         self.connect((self.streamops_delay_0, 0), (self.ieee802_11_sync_short_0, 0))
         self.connect((self.streamops_delay_0, 0), (self.math_conjugate_0, 0))
+        self.connect((self.streamops_delay_0_0, 0), (self.ieee802_11_sync_long_0, 1))
+        self.connect((self.streamops_stream_to_vector_0, 0), (self.ieee802_11_packetize_frame_0, 0))
 
 
     def get_window_size(self):

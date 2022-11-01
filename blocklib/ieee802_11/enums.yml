@@ -1,0 +1,6 @@
+algorithm_t:
+  enumerators:
+  - id: LS
+  - id: LMS
+  - id: COMB
+  - id: STA

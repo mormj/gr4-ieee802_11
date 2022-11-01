@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, 2016 Bastian Bloessl <bloessl@ccs-labs.org>
+ * Copyright (C) 2015 Bastian Bloessl <bloessl@ccs-labs.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,34 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef INCLUDED_IEEE802_11_MAPPER_H
-#define INCLUDED_IEEE802_11_MAPPER_H
 
-#include <gnuradio/block.h>
+#ifndef INCLUDED_IEEE802_11_EQUALIZER_STA_H
+#define INCLUDED_IEEE802_11_EQUALIZER_STA_H
+
+#include "base.h"
+#include <vector>
 
 namespace gr {
 namespace ieee802_11 {
+namespace equalizer {
 
-enum Encoding {
-    BPSK_1_2 = 0,
-    BPSK_3_4 = 1,
-    QPSK_1_2 = 2,
-    QPSK_3_4 = 3,
-    QAM16_1_2 = 4,
-    QAM16_3_4 = 5,
-    QAM64_2_3 = 6,
-    QAM64_3_4 = 7,
-};
-
-class mapper : virtual public block
-{
+class sta: public base {
 public:
-    typedef std::shared_ptr<mapper> sptr;
-    static sptr make(Encoding mcs, bool debug = false);
-    virtual void set_encoding(Encoding mcs) = 0;
+	virtual void equalize(gr_complex *in, int n, gr_complex *symbols, uint8_t *bits, std::shared_ptr<gr::kernel::digital::constellation> mod);
+	double get_snr();
+
+private:
+	
+	double d_snr;
+
+	const double alpha = 0.5;
+	const int beta = 2;
 };
 
-} // namespace ieee802_11 {
-} // namespace gr
+} /* namespace channel_estimation */
+} /* namespace wifigpu */
+} /* namespace gr */
 
-#endif /* INCLUDED_IEEE802_11_MAPPER_H */
+#endif /* INCLUDED_IEEE802_11_EQUALIZER_STA_H */

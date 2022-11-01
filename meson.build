@@ -67,6 +67,7 @@ pmtf_dep = dependency('pmtf', version : '>= 0.0.2')
 gnuradio_gr_dep = dependency('gnuradio-runtime')
 gr_kernel_filter_lib_dep = dependency('gnuradio-kernel-filter')
 gr_kernel_fft_lib_dep = dependency('gnuradio-kernel-fft')
+gr_kernel_digital_lib_dep = dependency('gnuradio-kernel-digital')
 
 if GR_ENABLE_PYTHON
 run_command('python3', join_paths(SCRIPTS_DIR,'gen_meson.py'), 

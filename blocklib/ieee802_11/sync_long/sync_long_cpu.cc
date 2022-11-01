@@ -25,6 +25,8 @@ sync_long_cpu::sync_long_cpu(block_args args)
       d_state(SYNC),
       SYNC_LENGTH(args.sync_length)
 {
+    set_tag_propagation_policy(tag_propagation_policy_t::TPP_DONT);
+    d_correlation = (gr_complex*)volk_malloc(sizeof(gr_complex) * 8192, volk_get_alignment());
 }
 
 work_return_t sync_long_cpu::work(work_io& wio)

@@ -119,9 +119,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [896, 580.0]
+    coordinate: [936, 492.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: fileio_file_source_0
   id: fileio_file_source
   parameters:
@@ -188,6 +188,48 @@ blocks:
     coordinate: [952, 244.0]
     rotation: 0
     state: true
+- name: ieee802_11_packetize_frame_0
+  id: ieee802_11_packetize_frame
+  parameters:
+    affinity: ''
+    algo: ieee802_11.algorithm_t.LS
+    alias: ''
+    bw: samp_rate
+    comment: ''
+    debug: 'False'
+    freq: freq
+    impl: cpu
+    log: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 596.0]
+    rotation: 0
+    state: true
+- name: ieee802_11_sync_long_0
+  id: ieee802_11_sync_long
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    debug: 'False'
+    impl: cpu
+    log: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+    sync_length: '320'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [648, 516.0]
+    rotation: 0
+    state: true
 - name: ieee802_11_sync_short_0
   id: ieee802_11_sync_short
   parameters:
@@ -206,7 +248,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [560, 548.0]
+    coordinate: [232, 500.0]
     rotation: 0
     state: enabled
 - name: import_0
@@ -366,6 +408,44 @@ blocks:
     coordinate: [400, 236.0]
     rotation: 0
     state: true
+- name: streamops_delay_0_0
+  id: streamops_delay
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dly: sync_length
+    impl: cpu
+    itemsize: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [448, 628.0]
+    rotation: 0
+    state: true
+- name: streamops_stream_to_vector_0
+  id: streamops_stream_to_vector
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    impl: cpu
+    itemsize: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    showports: 'False'
+    vlen: '64'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [816, 668.0]
+    rotation: 0
+    state: true
 
 connections:
 - [fileio_file_source_0, '0', math_complex_to_mag_squared_0, '0']
@@ -374,7 +454,10 @@ connections:
 - [filter_moving_average_0, '0', math_divide_0, '1']
 - [filter_moving_average_1, '0', ieee802_11_sync_short_0, '1']
 - [filter_moving_average_1, '0', math_complex_to_mag_1, '0']
-- [ieee802_11_sync_short_0, '0', blocks_null_sink_0, '0']
+- [ieee802_11_sync_long_0, '0', blocks_null_sink_0, '0']
+- [ieee802_11_sync_long_0, '0', streamops_stream_to_vector_0, '0']
+- [ieee802_11_sync_short_0, '0', ieee802_11_sync_long_0, '0']
+- [ieee802_11_sync_short_0, '0', streamops_delay_0_0, '0']
 - [math_complex_to_mag_1, '0', math_divide_0, '0']
 - [math_complex_to_mag_squared_0, '0', filter_moving_average_0, '0']
 - [math_conjugate_0, '0', math_multiply_0, '0']
@@ -382,6 +465,8 @@ connections:
 - [math_multiply_0, '0', filter_moving_average_1, '0']
 - [streamops_delay_0, '0', ieee802_11_sync_short_0, '0']
 - [streamops_delay_0, '0', math_conjugate_0, '0']
+- [streamops_delay_0_0, '0', ieee802_11_sync_long_0, '1']
+- [streamops_stream_to_vector_0, '0', ieee802_11_packetize_frame_0, '0']
 
 metadata:
   file_format: 1

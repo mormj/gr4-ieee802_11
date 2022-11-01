@@ -1,15 +1,25 @@
 module: ieee802_11
-block: sync_long
-label: Sync Long
+block: packetize_frame
+label: Packetize Frame
 blocktype: block
 
+includes:
+  - gnuradio/ieee802_11/enums.h
+
 parameters:
--   id: sync_length
-    label: Sync Length
-    dtype: size
+-   id: algo
+    label: Algorithm
+    dtype: enums/algorithm_t
     settable: false
-    grc:
-        default: 320
+    is_enum: true
+-   id: freq
+    label: Frequency
+    dtype: rf64
+    settable: false
+-   id: bw
+    label: Bandwidth
+    dtype: rf64
+    settable: false
 -   id: log
     label: Log
     dtype: bool
@@ -26,20 +36,14 @@ ports:
     id: in
     direction: input
     type: cf32
--   domain: stream
-    id: in_delayed
-    direction: input
-    type: cf32
--   domain: stream
-    id: out
+    shape: '64'
+-   domain: message
+    id: pdus
     direction: output
-    type: cf32
-    # shape: '64'
+    optional: true
 
 implementations:
 -   id: cpu
 # -   id: cuda
-# -   id: opt
-#     domain: cpu
 
 file_format: 1
