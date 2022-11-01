@@ -34,22 +34,26 @@ work_return_t sync_long_cpu::work(work_io& wio)
     auto out = wio.outputs()[0].items<gr_complex>();
 
     /* Forecasting */
-    int ninput = std::min(std::min(ninput_items[0], ninput_items[1]), 8192);
+    size_t ninput = std::min(std::min(wio.inputs()[0].n_items, wio.inputs()[1].n_items), size_t(8192));
     auto noutput = std::min(ninput, wio.outputs()[0].n_items);
-    noutput =  (noutput / 64) * 64; // output_multiple
+    noutput = (noutput / 64) * 64; // output_multiple
+
+    if (noutput < 1)
+        return work_return_t::INSUFFICIENT_INPUT_ITEMS;
     /***************/
 
 
     // dout << "LONG ninput[0] " << ninput_items[0] << "   ninput[1] " << ninput_items[1]
     //      << "  noutput " << noutput << "   state " << d_state << std::endl;
-   
 
-    const uint64_t nread = wio.outputs()[0].nitems_read(0);
-    wio.get_tags_in_range(d_tags, 0, nread, nread + ninput);
+
+    const uint64_t nread = wio.inputs()[0].nitems_read();
+    d_tags = wio.inputs()[0].tags_in_window(0, ninput);
+    // wio.get_tags_in_range(d_tags, 0, nread, nread + ninput);
     if (d_tags.size()) {
-        std::sort(d_tags.begin(), d_tags.end(), gr::tag_t::offset_compare);
+        // std::sort(d_tags.begin(), d_tags.end(), gr::tag_t::offset_compare);
 
-        const uint64_t offset = d_tags.front().offset;
+        const uint64_t offset = d_tags.front().offset();
 
         if (offset > nread) {
             ninput = offset - nread;
@@ -60,18 +64,20 @@ work_return_t sync_long_cpu::work(work_io& wio)
             if (d_state == COPY) {
                 d_state = RESET;
             }
-            d_freq_offset_short = pmt::to_double(d_tags.front().value);
+            // d_freq_offset_short = pmt::to_double(d_tags.front().value);
+            // d_freq_offset_short = pmtf::get_as<double>(d_tags.front().value);
+            d_freq_offset_short = pmtf::get_as<double>(d_tags[0]["wifi_start"]);
         }
     }
 
 
-    int i = 0;
-    int o = 0;
+    size_t i = 0;
+    size_t o = 0;
 
     switch (d_state) {
 
     case SYNC:
-        d_fir.filterN(d_correlation, in, std::min(SYNC_LENGTH, std::max(ninput - 63, 0)));
+        d_fir.filterN(d_correlation, in, std::min(SYNC_LENGTH, (size_t)std::max((int)ninput - 63, 0)));
 
         while (i + 63 < ninput) {
 
@@ -82,7 +88,8 @@ work_return_t sync_long_cpu::work(work_io& wio)
 
             if (d_offset == SYNC_LENGTH) {
                 search_frame_start();
-                mylog(boost::format("LONG: frame start at %1%") % d_frame_start);
+                // mylog(boost::format("LONG: frame start at %1%") % d_frame_start);
+                mylog(fmt::format("LONG: frame start {}", d_frame_start));
                 d_offset = 0;
                 d_count = 0;
                 d_state = COPY;
@@ -99,11 +106,15 @@ work_return_t sync_long_cpu::work(work_io& wio)
             int rel = d_offset - d_frame_start;
 
             if (!rel) {
-                add_item_tag(0,
-                             nitems_written(0),
-                             pmt::string_to_symbol("wifi_start"),
-                             pmt::from_double(d_freq_offset_short - d_freq_offset),
-                             pmt::string_to_symbol(name()));
+                // add_item_tag(0,
+                //              nitems_written(0),
+                //              pmt::string_to_symbol("wifi_start"),
+                //              pmt::from_double(d_freq_offset_short - d_freq_offset),
+                //              pmt::string_to_symbol(name()));
+                wio.outputs()[0].add_tag(
+                    wio.outputs()[0].nitems_written(),
+                    pmtf::map({ { "wifi_start", d_freq_offset_short - d_freq_offset },
+                                { "srcid", name() } }));
             }
 
             if (rel >= 0 && (rel < 128 || ((rel - 128) % 80) > 15)) {
@@ -136,14 +147,16 @@ work_return_t sync_long_cpu::work(work_io& wio)
     dout << "produced : " << o << " consumed: " << i << std::endl;
 
     d_count += o;
-    consume(0, i);
-    consume(1, i);
-    return o;
+    // consume(0, i);
+    // consume(1, i);
+    wio.consume_each(i);
+    wio.produce_each(o);
+    // return o;
     return work_return_t::OK;
 }
 
 
-const std::vector<gr_complex> sync_long_impl::LONG = {
+const std::vector<gr_complex> sync_long_cpu::LONG = {
     gr_complex(-0.0455, -1.0679), gr_complex(0.3528, -0.9865),
     gr_complex(0.8594, 0.7348),   gr_complex(0.1874, 0.2475),
     gr_complex(0.5309, -0.7784),  gr_complex(-1.0218, -0.4897),

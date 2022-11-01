@@ -27,7 +27,7 @@ gnuradio_blocklib_ieee802_11_lib = library('gnuradio-blocklib-ieee802_11',
     install : true,
     link_language: 'cpp',
     dependencies : ieee802_11_deps,
-    link_args : ['-lgnuradio-runtime'],
+    link_args : ['-lgnuradio-runtime', '-lgnuradio-kernel-filter'],
     cpp_args : block_cpp_args)
 
 gnuradio_blocklib_ieee802_11_dep = declare_dependency(include_directories : incdir,
